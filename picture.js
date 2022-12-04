@@ -17,7 +17,21 @@ export class Picture{
         this.img = new Image(); 
         this.img.src = src;
 
+        this.file = document.querySelector('#uploaded-img');
+        this.file.addEventListener('change', () => {
+            this.img.src = URL.createObjectURL(this.file.files[0]);
+            this.ctx.drawImage( this.img, 0, 0, this.canvas.width, this.canvas.height );
+            const data = this.ctx.getImageData( this.canvas.width/3 , this.canvas.height/3 , 1, 1 ).data;
+            
+            for(let i = 0 ; i < 3 ; i++ ){
+                if( data[i]>200 ){
+                    data[i] -= 55; //너무 밝은색이면 보정
+                }
+            }
+            document.body.style.background = `linear-gradient( rgb( ${data[0]}, ${data[1]}, ${data[2]} ) , black)`
+        });
 
+        
     }
     getPixels( radius, stageWidth, stageHeight){
         
@@ -29,9 +43,10 @@ export class Picture{
         let i = 0 ; 
         let pixel;
 
-        this.draw();
+        
+        this.ctx.drawImage( this.img, 0, 0, this.canvas.width, this.canvas.height );
 
-        for( let height = 0; height < stageHeight; height += radius*2) {
+        for( let height = 0; height < stageHeight ; height += radius*2) {
 
             for (let width = 0; width < stageWidth; width += radius*2 ) {
                 
@@ -44,10 +59,13 @@ export class Picture{
                 pixels.push( pixel );
             }
         }
+
         return pixels;
+
     }
 
-    draw(){
-        this.ctx.drawImage( this.img, 0, 0, this.canvas.width, this.canvas.height );
+    setPicture(src){
+        this.img.src = src;
     }
+
 }
